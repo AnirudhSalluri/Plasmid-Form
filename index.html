@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation with CAPTCHA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { max-width: 500px; margin-top: 50px; }
+        .error { color: red; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Signup Form</h2>
+        <form id="signupForm">
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name">
+                <span class="error" id="nameError"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="email">
+                <span class="error" id="emailError"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone">
+                <span class="error" id="phoneError"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" id="password">
+                <span class="error" id="passwordError"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword">
+                <span class="error" id="confirmPasswordError"></span>
+            </div>
+            
+            <!-- CAPTCHA -->
+            <div class="mb-3">
+                <label class="form-label">Solve CAPTCHA: <span id="captcha"></span></label>
+                <input type="text" class="form-control" id="captchaInput">
+                <span class="error" id="captchaError"></span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("signupForm");
+            const nameInput = document.getElementById("name");
+            const emailInput = document.getElementById("email");
+            const phoneInput = document.getElementById("phone");
+            const passwordInput = document.getElementById("password");
+            const confirmPasswordInput = document.getElementById("confirmPassword");
+            const captchaText = document.getElementById("captcha");
+            const captchaInput = document.getElementById("captchaInput");
+            
+            let captchaAnswer = generateCaptcha();
+            
+            function generateCaptcha() {
+                let num1 = Math.floor(Math.random() * 10);
+                let num2 = Math.floor(Math.random() * 10);
+                captchaText.innerText = `${num1} + ${num2} = ?`;
+                return num1 + num2;
+            }
+            
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                let isValid = true;
+                
+                // Name validation
+                if (nameInput.value.length < 5) {
+                    document.getElementById("nameError").innerText = "Name must be at least 5 characters.";
+                    isValid = false;
+                } else {
+                    document.getElementById("nameError").innerText = "";
+                }
+                
+                // Email validation
+                if (!emailInput.value.includes("@")) {
+                    document.getElementById("emailError").innerText = "Enter a valid email.";
+                    isValid = false;
+                } else {
+                    document.getElementById("emailError").innerText = "";
+                }
+                
+                // Phone validation
+                if (phoneInput.value.length !== 10 || phoneInput.value === "123456789") {
+                    document.getElementById("phoneError").innerText = "Enter a valid 10-digit phone number.";
+                    isValid = false;
+                } else {
+                    document.getElementById("phoneError").innerText = "";
+                }
+                
+                // Password validation
+                if (passwordInput.value.length < 8 || passwordInput.value.toLowerCase() === "password" || passwordInput.value.toLowerCase() === nameInput.value.toLowerCase()) {
+                    document.getElementById("passwordError").innerText = "Password must be at least 8 characters and not 'password' or your name.";
+                    isValid = false;
+                } else {
+                    document.getElementById("passwordError").innerText = "";
+                }
+                
+                // Confirm Password validation
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    document.getElementById("confirmPasswordError").innerText = "Passwords do not match.";
+                    isValid = false;
+                } else {
+                    document.getElementById("confirmPasswordError").innerText = "";
+                }
+                
+                // CAPTCHA validation
+                if (parseInt(captchaInput.value) !== captchaAnswer) {
+                    document.getElementById("captchaError").innerText = "Incorrect CAPTCHA answer.";
+                    isValid = false;
+                } else {
+                    document.getElementById("captchaError").innerText = "";
+                }
+                
+                if (isValid) {
+                    alert("Form submitted successfully!");
+                    form.reset();
+                    captchaAnswer = generateCaptcha();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
